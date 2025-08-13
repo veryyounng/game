@@ -42,23 +42,69 @@ const App = () => {
     }
   };
 
-  const makeAIMove = (currentBoard: (string | null)[]) => {
-    if (checkWinner(currentBoard)) return;
-
-    const emptyIndices = currentBoard
-      .map((val, idx) => (val === null ? idx : null))
-      .filter((val): val is number => val !== null);
-
-    if (emptyIndices.length === 0) return;
-
-    const randomIndex =
-      emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
-
-    const updatedBoard = [...currentBoard];
-    updatedBoard[randomIndex] = 'O';
-    setBoard(updatedBoard);
-    setTurn('X');
+  const makeAIMove = (board: (string | null)[]) => {
+    const bestMove = findBestMove(board);
+    if (bestMove !== null) {
+      const newBoard = [...board];
+      newBoard[bestMove] = 'O';
+      setBoard(newBoard);
+      setTurn('X');
+    }
   };
+
+  function findBestMove(board: (string | null)[]): number | null {
+    let bestScore = -Infinity;
+    let move: number | null = null;
+
+    for (let i = 0; i < 9; i++) {
+      if (!board[i]) {
+        board[i] = 'O'; // AI의 수 가정
+        const score = minimax(board, 0, false);
+        board[i] = null; // 원상복구
+
+        if (score > bestScore) {
+          bestScore = score;
+          move = i;
+        }
+      }
+    }
+    return move;
+  }
+
+  function minimax(
+    board: (string | null)[],
+    depth: number,
+    isMaximizing: boolean
+  ): number {
+    const winner = checkWinner(board);
+    if (winner === 'O') return 10 - depth;
+    if (winner === 'X') return depth - 10;
+    if (board.every((cell) => cell !== null)) return 0;
+
+    if (isMaximizing) {
+      let maxEval = -Infinity;
+      for (let i = 0; i < 9; i++) {
+        if (!board[i]) {
+          board[i] = 'O';
+          const evalScore = minimax(board, depth + 1, false);
+          board[i] = null;
+          maxEval = Math.max(maxEval, evalScore);
+        }
+      }
+      return maxEval;
+    } else {
+      let minEval = Infinity;
+      for (let i = 0; i < 9; i++) {
+        if (!board[i]) {
+          board[i] = 'X';
+          const evalScore = minimax(board, depth + 1, true);
+          board[i] = null;
+          minEval = Math.min(minEval, evalScore);
+        }
+      }
+      return minEval;
+    }
+  }
 
   const restart = () => {
     setBoard(Array(9).fill(null));
@@ -112,7 +158,7 @@ const App = () => {
             (e.target as HTMLButtonElement).style.backgroundColor = '#ffc5d9';
           }}
         >
-          🤖 1인 플레이
+          🤖 AI 플레이
         </button>
 
         <button
