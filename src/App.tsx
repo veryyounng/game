@@ -83,7 +83,7 @@ const App = () => {
             (e.target as HTMLButtonElement).style.backgroundColor = '#ffc5d9';
           }}
         >
-          🤖 AI와 플레이
+          🤖 1인 플레이
         </button>
 
         <button
