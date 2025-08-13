@@ -275,8 +275,8 @@ const App = () => {
           fontSize: '18px',
         }}
       >
-        <div>❌ X: {score.X}</div>
-        <div>⭕ O: {score.O}</div>
+        <div>❌ : {score.X}</div>
+        <div>⭕ : {score.O}</div>
         <div>🤝 무승부: {score.draw}</div>
       </div>
     </div>
