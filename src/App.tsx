@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './style.css';
 
 const App = () => {
@@ -7,6 +7,22 @@ const App = () => {
   const winner = checkWinner(board);
   const isAIMode = true; // 나중에 모드 선택 기능으로 확장 가능
   const [gameMode, setGameMode] = useState<'AI' | '2P' | null>(null);
+
+  useEffect(() => {
+    const winner = checkWinner(board);
+
+    if (winner) {
+      setScore((prev) => ({
+        ...prev,
+        [winner]: prev[winner as 'X' | 'O'] + 1,
+      }));
+    } else if (board.every((cell) => cell !== null)) {
+      setScore((prev) => ({
+        ...prev,
+        draw: prev.draw + 1,
+      }));
+    }
+  }, [board]);
 
   const handleClick = (i: number) => {
     if (board[i] || winner) return;
@@ -47,6 +63,19 @@ const App = () => {
   const restart = () => {
     setBoard(Array(9).fill(null));
     setTurn('X');
+    setGameMode(null);
+  };
+
+  const [score, setScore] = useState({
+    X: 0,
+    O: 0,
+    draw: 0,
+  });
+
+  const resetGame = () => {
+    setBoard(Array(9).fill(null));
+    setTurn('X');
+    setScore({ X: 0, O: 0, draw: 0 });
     setGameMode(null);
   };
 
@@ -191,6 +220,19 @@ const App = () => {
       >
         Restart
       </button>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '30px',
+          marginTop: '10px',
+          fontSize: '18px',
+        }}
+      >
+        <div>❌ X: {score.X}</div>
+        <div>⭕ O: {score.O}</div>
+        <div>🤝 무승부: {score.draw}</div>
+      </div>
     </div>
   );
 };
